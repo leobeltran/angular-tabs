@@ -4,10 +4,15 @@
     return {
       restrict: 'E',
       transclude: true,
-      template: '<h2>Hello, World!</h2> <div role="tabpanel" ng-transclude></div>',
+      template: '<div role="tabpanel" ng-show="active" ng-transclude></div>',
       require: '^tabset',
-      scope: { },
-      link: function(scope, elem, attr, tabsetCtrl){}
+      scope: {
+        heading: '@', //@ symbol tells the scope that the heading is a string
+       },
+      link: function(scope, elem, attr, tabsetCtrl) {
+        scope.active = false;
+        tabsetCtrl.addTab(scope);
+      }
     }
   })
   .directive('tabset', function(){
@@ -21,6 +26,22 @@
       controller: function(){
         var self = this;
         self.tabs = [];
+        self.addTab = function addTab(tab){
+          self.tabs.push(tab);
+
+          if(self.tabs.length === 1){
+            tab.active = true;
+          }
+        }
+        self.select = function(selectedTab){
+          angular.forEach(self.tabs, function(tab) {
+            if(tab.active && tab !== selectedTab){
+              tab.active = false;
+            }
+          })
+
+          selectedTab.active = true;
+        }
       },
     }
   })
